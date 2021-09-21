@@ -1,6 +1,6 @@
 package com.ironhack.midterm.service.impl;
 
-import com.ironhack.midterm.dao.CheckingAccount;
+import com.ironhack.midterm.dao.account.CheckingAccount;
 import com.ironhack.midterm.repository.CheckingAccountRepository;
 import com.ironhack.midterm.service.interfaces.ICheckingAccountService;
 import org.springframework.beans.factory.annotation.Autowired;

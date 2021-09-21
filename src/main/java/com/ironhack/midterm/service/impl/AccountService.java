@@ -1,13 +1,12 @@
 package com.ironhack.midterm.service.impl;
 
-import com.ironhack.midterm.dao.Account;
+import com.ironhack.midterm.dao.account.Account;
 import com.ironhack.midterm.repository.AccountRepository;
 import com.ironhack.midterm.service.interfaces.IAccountService;
 import com.ironhack.midterm.utils.Money;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service

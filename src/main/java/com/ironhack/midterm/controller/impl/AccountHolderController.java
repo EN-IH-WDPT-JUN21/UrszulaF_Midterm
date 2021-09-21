@@ -1,7 +1,7 @@
 package com.ironhack.midterm.controller.impl;
 
 import com.ironhack.midterm.controller.interfaces.IAccountHolderController;
-import com.ironhack.midterm.dao.AccountHolder;
+import com.ironhack.midterm.dao.user.AccountHolder;
 import com.ironhack.midterm.repository.AccountHolderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,7 @@
-package com.ironhack.midterm.dao;
+package com.ironhack.midterm.dao.account;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ironhack.midterm.dao.account.Account;
 import com.ironhack.midterm.enums.TransactionType;
 import com.ironhack.midterm.utils.Money;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -27,28 +29,32 @@ public class Transaction {
 
     private Money amount;
 
-    @ManyToOne
-    @JoinColumn(name="account_id", referencedColumnName = "id")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Account account;
+    private LocalDateTime timeStamp;
 
     @ManyToOne
-    @JoinColumn(name="accountSecond_id", referencedColumnName = "id")
+    @JoinColumn(name="senderAccountId", referencedColumnName = "id")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Account accountSecond;
+    private Account senderAccount;
+
+    @ManyToOne
+    @JoinColumn(name="recipientAccountId", referencedColumnName = "id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Account recipientAccount;
 
 //    one side transaction
-    public Transaction(TransactionType transactionType, Money amount, Account account) {
+    public Transaction(TransactionType transactionType, Money amount, Account senderAccount) {
         this.transactionType = transactionType;
         this.amount = amount;
-        this.account = account;
+        this.senderAccount = senderAccount;
+        this.timeStamp = LocalDateTime.now();
     }
 
 //    two-sides transaction
-    public Transaction(TransactionType transactionType, Money amount, Account account, Account accountSecond) {
+    public Transaction(TransactionType transactionType, Money amount, Account senderAccount, Account recipientAccount) {
         this.transactionType = transactionType;
         this.amount = amount;
-        this.account = account;
-        this.accountSecond = accountSecond;
+        this.senderAccount = senderAccount;
+        this.recipientAccount = recipientAccount;
+        this.timeStamp = LocalDateTime.now();
     }
 }

@@ -1,17 +1,15 @@
-package com.ironhack.midterm.dao;
+package com.ironhack.midterm.dao.account;
 
+import com.ironhack.midterm.dao.account.Account;
+import com.ironhack.midterm.dao.user.AccountHolder;
 import com.ironhack.midterm.enums.Status;
 import com.ironhack.midterm.utils.Money;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;
-import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -20,10 +18,10 @@ import java.util.List;
 @NoArgsConstructor
 //@AllArgsConstructor
 @Entity
-public class StudentCheckingAccount extends Account{
+public class StudentCheckingAccount extends Account {
 
-    public StudentCheckingAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, Money penaltyFee, Status status) {
-        super(balance, secretKey, primaryOwner, secondaryOwners, penaltyFee, status);
+    public StudentCheckingAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners) {
+        super(balance, secretKey, primaryOwner, secondaryOwners);
         setPrimaryOwner(primaryOwner);
     }
 

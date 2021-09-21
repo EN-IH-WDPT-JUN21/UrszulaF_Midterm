@@ -1,6 +1,11 @@
-package com.ironhack.midterm.dao;
+package com.ironhack.midterm.dao.account;
 
+import com.ironhack.midterm.dao.account.Account;
+import com.ironhack.midterm.dao.user.AccountHolder;
 import com.ironhack.midterm.enums.Status;
+import com.ironhack.midterm.service.impl.Freezable;
+import com.ironhack.midterm.service.impl.Penalizable;
+import com.ironhack.midterm.utils.Constants;
 import com.ironhack.midterm.utils.Money;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,9 +14,7 @@ import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -20,17 +23,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class CheckingAccount extends Account{
+public class CheckingAccount extends Account implements Freezable, Penalizable {
 
 
     private Money minimumBalance;
 
     private Money monthlyMaintenanceFee;
 
-    public CheckingAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, Money penaltyFee, Status status, Money minimumBalance, Money monthlyMaintenanceFee) {
-        super(balance, secretKey, primaryOwner, secondaryOwners, penaltyFee, status);
-        this.minimumBalance = minimumBalance;
-        this.monthlyMaintenanceFee = monthlyMaintenanceFee;
+    private Money penaltyFee;
+
+    public CheckingAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners) {
+        super(balance, secretKey, primaryOwner, secondaryOwners);
+        this.minimumBalance = new Money(Constants.CHECKING_ACC_DEFAULT_MONTHLY_FEE);
+        this.monthlyMaintenanceFee = new Money(Constants.CHECKING_ACC_MIN_BALANCE);
+        this.penaltyFee = new Money(BigDecimal.ZERO);
         setPrimaryOwner(primaryOwner);
     }
 

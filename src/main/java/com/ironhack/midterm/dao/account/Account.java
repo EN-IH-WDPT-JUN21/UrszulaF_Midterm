@@ -1,7 +1,10 @@
-package com.ironhack.midterm.dao;
+package com.ironhack.midterm.dao.account;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ironhack.midterm.dao.user.AccountHolder;
 import com.ironhack.midterm.enums.Status;
+import com.ironhack.midterm.service.impl.Freezable;
+import com.ironhack.midterm.service.impl.Penalizable;
 import com.ironhack.midterm.utils.Money;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,9 +13,8 @@ import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Account {
+public abstract class Account implements Freezable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
@@ -50,25 +52,26 @@ public abstract class Account {
     )
     protected List<AccountHolder> secondaryOwners;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-    private List<Transaction> transactions;
+    @OneToMany(mappedBy = "senderAccount", cascade = CascadeType.ALL)
+    private List<Transaction> transactionsSend;
 
-    protected Money penaltyFee;
+    @OneToMany(mappedBy = "recipientAccount", cascade = CascadeType.ALL)
+    private List<Transaction> transactionsReceived;
 
-    protected Date creationDate;
+
+
+    protected LocalDateTime creationDate;
 
     @Enumerated(EnumType.STRING)
     protected Status status;
 
-    public Account(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, Money penaltyFee, Status status) {
+    public Account(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners) {
         this.balance = balance;
         this.secretKey = secretKey;
         this.primaryOwner = primaryOwner;
         this.secondaryOwners = secondaryOwners;
-        this.penaltyFee = penaltyFee;
-        this.creationDate = new Date();
-        this.status = status;
+        this.creationDate = LocalDateTime.now();
+        this.status = Status.ACTIVE;
     }
-
 
 }

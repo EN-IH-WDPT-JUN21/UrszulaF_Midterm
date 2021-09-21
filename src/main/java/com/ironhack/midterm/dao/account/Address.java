@@ -1,4 +1,4 @@
-package com.ironhack.midterm.dao;
+package com.ironhack.midterm.dao.account;
 
 
 import javax.persistence.Embeddable;

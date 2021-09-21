@@ -1,6 +1,6 @@
 package com.ironhack.midterm.controller.interfaces;
 
-import com.ironhack.midterm.dao.CheckingAccount;
+import com.ironhack.midterm.dao.account.CheckingAccount;
 
 import java.util.List;
 

@@ -1,5 +1,6 @@
-package com.ironhack.midterm.dao;
+package com.ironhack.midterm.dao.user;
 
+import com.ironhack.midterm.dao.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

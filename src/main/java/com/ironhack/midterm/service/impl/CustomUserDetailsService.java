@@ -1,7 +1,7 @@
 package com.ironhack.midterm.service.impl;
 
 import com.ironhack.midterm.Security.CustomUserDetails;
-import com.ironhack.midterm.dao.User;
+import com.ironhack.midterm.dao.user.User;
 import com.ironhack.midterm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

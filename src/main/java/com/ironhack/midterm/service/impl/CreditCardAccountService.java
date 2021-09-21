@@ -1,10 +1,7 @@
 package com.ironhack.midterm.service.impl;
 
-import com.ironhack.midterm.dao.CheckingAccount;
-import com.ironhack.midterm.dao.CreditCardAccount;
-import com.ironhack.midterm.repository.CheckingAccountRepository;
+import com.ironhack.midterm.dao.account.CreditCardAccount;
 import com.ironhack.midterm.repository.CreditCardAccountRepository;
-import com.ironhack.midterm.service.interfaces.ICheckingAccountService;
 import com.ironhack.midterm.service.interfaces.ICreditCardAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

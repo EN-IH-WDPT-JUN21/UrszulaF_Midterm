@@ -1,6 +1,6 @@
 package com.ironhack.midterm.controller.interfaces;
 
-import com.ironhack.midterm.dao.CreditCardAccount;
+import com.ironhack.midterm.dao.account.CreditCardAccount;
 
 import java.util.List;
 

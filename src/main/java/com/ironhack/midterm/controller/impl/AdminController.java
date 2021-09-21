@@ -1,7 +1,7 @@
 package com.ironhack.midterm.controller.impl;
 
 import com.ironhack.midterm.controller.interfaces.IAdminController;
-import com.ironhack.midterm.dao.Admin;
+import com.ironhack.midterm.dao.user.Admin;
 import com.ironhack.midterm.repository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

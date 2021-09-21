@@ -1,6 +1,6 @@
 package com.ironhack.midterm.controller.interfaces;
 
-import com.ironhack.midterm.dao.SavingAccount;
+import com.ironhack.midterm.dao.account.SavingAccount;
 
 import java.util.List;
 

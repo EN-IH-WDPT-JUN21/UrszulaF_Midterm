@@ -1,6 +1,6 @@
 package com.ironhack.midterm.controller.interfaces;
 
-import com.ironhack.midterm.dao.ThirdParty;
+import com.ironhack.midterm.dao.user.ThirdParty;
 
 import java.util.List;
 

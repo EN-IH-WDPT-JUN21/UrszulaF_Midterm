@@ -1,6 +1,6 @@
 package com.ironhack.midterm.repository;
 
-import com.ironhack.midterm.dao.StudentCheckingAccount;
+import com.ironhack.midterm.dao.account.StudentCheckingAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

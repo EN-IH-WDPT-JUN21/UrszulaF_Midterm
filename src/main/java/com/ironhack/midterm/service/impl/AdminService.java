@@ -1,6 +1,6 @@
 package com.ironhack.midterm.service.impl;
 
-import com.ironhack.midterm.dao.Admin;
+import com.ironhack.midterm.dao.user.Admin;
 import com.ironhack.midterm.repository.AdminRepository;
 import com.ironhack.midterm.service.interfaces.IAdminService;
 import org.springframework.beans.factory.annotation.Autowired;

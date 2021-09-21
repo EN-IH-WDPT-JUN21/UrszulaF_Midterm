@@ -9,7 +9,7 @@ use midterm;
 
 show tables;
 
-select * from credit_card_account;
+select * from transaction;
 select * from patient;
 
 */

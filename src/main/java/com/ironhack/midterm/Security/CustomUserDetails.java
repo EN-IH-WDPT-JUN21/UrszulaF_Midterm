@@ -1,6 +1,6 @@
 package com.ironhack.midterm.Security;
 
-import com.ironhack.midterm.dao.User;
+import com.ironhack.midterm.dao.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

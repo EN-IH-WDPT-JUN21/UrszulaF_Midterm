@@ -1,6 +1,6 @@
 package com.ironhack.midterm.service.impl;
 
-import com.ironhack.midterm.dao.AccountHolder;
+import com.ironhack.midterm.dao.user.AccountHolder;
 import com.ironhack.midterm.repository.AccountHolderRepository;
 import com.ironhack.midterm.service.interfaces.IAccountHolderService;
 import org.springframework.beans.factory.annotation.Autowired;
