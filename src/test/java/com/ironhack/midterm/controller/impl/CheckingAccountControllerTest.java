@@ -1,41 +1,23 @@
 package com.ironhack.midterm.controller.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ironhack.midterm.Security.CustomUserDetails;
-import com.ironhack.midterm.controller.dto.AccountHolderDTO;
-import com.ironhack.midterm.controller.dto.BalanceDTO;
-import com.ironhack.midterm.controller.dto.SavingAccountDTO;
-import com.ironhack.midterm.controller.dto.StatusDTO;
 import com.ironhack.midterm.dao.account.*;
 import com.ironhack.midterm.dao.user.*;
-import com.ironhack.midterm.enums.Status;
 import com.ironhack.midterm.repository.*;
 import com.ironhack.midterm.utils.Money;
-import org.hibernate.type.LocalDateType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContext;
-import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,9 +25,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @SpringBootTest
-class AccountControllerTest {
+class CheckingAccountControllerTest {
+
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -102,7 +84,6 @@ class AccountControllerTest {
     private SavingAccount savingAccount1;
     private StudentCheckingAccount studentCheckingAccount1;
 
-
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -134,7 +115,6 @@ class AccountControllerTest {
         List<Account> accounts = accountRepository.saveAll(List.of(checkingAccount1, creditCardAccount1, savingAccount1, studentCheckingAccount1));
     }
 
-
     @AfterEach
     void tearDown() {
 //        roleRepository.deleteAll();
@@ -142,70 +122,24 @@ class AccountControllerTest {
 //        accountRepository.deleteAll();
     }
 
+
+
     @Test
-    void getAccounts() throws Exception{
-        MvcResult result = mockMvc.perform(get("/accounts")).andDo(print()).andExpect(status().isOk()).andReturn();
+    void getCheckingAccounts() throws Exception{
+        MvcResult result = mockMvc.perform(get("/checking-accounts")).andDo(print()).andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("12345"));
-        assertTrue(result.getResponse().getContentAsString().contains("55555"));
-        assertTrue(result.getResponse().getContentAsString().contains("00000"));
+        assertFalse(result.getResponse().getContentAsString().contains("55555"));
     }
 
     @Test
-    void getById() throws Exception{
+    void store() throws Exception{
+        CheckingAccount checkingAccount1 = new CheckingAccount(new Money(new BigDecimal(8000)), "43210", accountHolder2, List.of(accountHolder4));
+        String body = objectMapper.writeValueAsString(checkingAccount1);
         MvcResult result = mockMvc.perform(
-                get("/accounts/"+checkingAccount1.getId())
-        ).andDo(print()).andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("12345"));
-    }
-/*
-    @Test
-//    @WithMockUser(username="Ula", authorities ={"ACCOUNT_HOLDER"})
-    @WithUserDetails(value="Ula")
-    void testGetMyPrimaryAccounts() throws Exception{
-
-                MvcResult result = mockMvc.perform(
-                get("/my-accounts/primary/")
-        ).andDo(print()).andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("12345"));
-    }
-*/
-/*    @Test
-    void store() throws Exception {
-        AccountHolderDTO accountHolderDTO = new AccountHolderDTO("Jan", "$2a$10$MSzkrmfd5ZTipY0XkuCbAejBC9g74MAg2wrkeu8/m1wQGXDihaX3e", accountHolderRole, "1951-07-27", new Address("London", "UK", "Main 1", 23000), "jan@gmail.pl");
-        SavingAccount savingAccountDTO = new SavingAccountDTO(new Money(new BigDecimal(2000)), "88888", accountHolderDTO, List.of());
-        String body = objectMapper.writeValueAsString(savingAccountDTO);
-        MvcResult result = mockMvc.perform(
-                post("/accounts")
-                .content(body)
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isCreated()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("88888"));
-    }*/
-    @Test
-    void updateBalance() throws Exception{
-        BalanceDTO balanceDTO = new BalanceDTO();
-        balanceDTO.setBalance(new Money(new BigDecimal("2000.00")));
-        String body = objectMapper.writeValueAsString(balanceDTO);
-        MvcResult result = mockMvc.perform(
-                patch("/accounts/change-balance/"+checkingAccount1.getId())
+                post("/checking-accounts/new")
                         .content(body)
                         .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isNoContent()).andReturn();
-        assertEquals(new BigDecimal("2000.00"), accountRepository.findById(checkingAccount1.getId()).get().getBalance().getAmount());
+        ).andDo(print()).andExpect(status().isCreated()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("43210"));
     }
-    @Test
-    void updateStatus() throws Exception{
-        StatusDTO statusDTO = new StatusDTO(Status.FROZEN);
-        String body = objectMapper.writeValueAsString(statusDTO);
-        MvcResult result = mockMvc.perform(
-                patch("/accounts/change-status/"+checkingAccount1.getId())
-                        .content(body)
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isNoContent()).andReturn();
-        assertEquals(Status.FROZEN, accountRepository.findById(checkingAccount1.getId()).get().getStatus());
-    }
-/*
-    @Test
-    void delete() {
-    }*/
 }

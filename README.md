@@ -176,7 +176,6 @@ To run this project locally do the following after cloning or downloading the pr
         <li> are added to the database by an admin. </li>
       </ul> 
   </li>
-</li>
 </ol>
 
 ## API documentation:
@@ -188,23 +187,26 @@ Depending on the route you are trying to access, you will need different privile
       <ul> 
         <li> accounts: </li>
         <ul>
-        <li> Method: GET -- Route: /admin/account/id/{id} -- Response: Get account by account ID </li>
+        <li> Method: GET -- Route: /accounts -- Response: Get all accounts </li>
+        <li> Method: GET -- Route: /accounts/{id} -- Response: Get account by account ID </li>
         <li> Method: GET -- Route: /admin/account/{id}/balance -- Response: Get balance by account ID </li>
         <li> Method: GET -- Route: /admin/account/{id}/accounts -- Response: Get all accounts of a user by Account Holder ID </li>
-        <li> Method: POST -- Route: /admin/account/{id}/balance -- Response: Update balance by account ID </li>
-        <li> Method: GET -- Route: /admin/checking-accounts -- Response: Get all checking accounts </li>
-        <li> Method: POST -- Route: /admin/checking-account/new -- Response: Create a new checking account </li>
-        <li> Method: GET -- Route: /admin/credit-card-accounts -- Response: Get all credit cards accounts </li>
-        <li> Method: POST -- Route: /admin/credit-card-account/new -- Response: Create a new credit card account </li>   
-        <li> Method: GET -- Route: /admin/saving-accounts -- Response: Get all saving accounts </li>
-        <li> Method: POST -- Route: /admin/saving-account/new -- Response: Create a new saving account </li>   
-        <li> Method: GET -- Route: /admin/student-checking-accounts -- Response: Get all student checking accounts </li>
-        <li> Method: POST -- Route: /admin/student-checking-account/new -- Response: Create a new student checking account </li>   
+        <li> Method: PATCH -- Route: /accounts/change-balance/{id} -- Response: Update balance amount by account ID </li>
+        <li> Method: PATCH -- Route: /accounts/change-status/{id} -- Response: Update status by account ID </li>
+        <li> Method: GET -- Route: /checking-accounts -- Response: Get all checking accounts </li>
+        <li> Method: POST -- Route: /checking-account/new -- Response: Create a new checking account </li>
+        <li> Method: GET -- Route: /credit-card-accounts -- Response: Get all credit cards accounts </li>
+        <li> Method: POST -- Route: /credit-card-account/new -- Response: Create a new credit card account </li>   
+        <li> Method: GET -- Route: /saving-accounts -- Response: Get all saving accounts </li>
+        <li> Method: POST -- Route: /saving-account/new -- Response: Create a new saving account </li>   
+        <li> Method: GET -- Route: /student-checking-accounts -- Response: Get all student checking accounts </li>
+        <li> Method: POST -- Route: /student-checking-account/new -- Response: Create a new student checking account </li>   
         </ul>        
         <li> Account Holders: </li>
         <ul>        
-        <li> Method: GET -- Route: /admin/account-holders -- Response: Get all Account Holders </li>
-        <li> Method: POST -- Route: /admin/account-holder/new -- Response: Create a new Account Holder </li>
+            <li> Method: GET -- Route: /account-holders -- Response: Get all Account Holders </li>
+            <li> Method: GET -- Route: /account-holders/{id} -- Response: Get Account Holder by Account Holder ID </li>
+            <li> Method: POST -- Route: /account-holders/new -- Response: Create a new Account Holder </li>
         </ul>        
         <li> Third Parties: </li>
         <ul>        
@@ -215,6 +217,8 @@ Depending on the route you are trying to access, you will need different privile
   </li>
     <li> User routes:
       <ul> 
+        <li> Method: GET -- Route: /my-accounts/primary/ -- Response: Get all primary accounts of a user by Account Holder ID </li>
+        <li> Method: GET -- Route: /my-accounts/secondary -- Response: Get all secondary accounts of a user by Account Holder ID </li>
         <li> Method: GET -- Route: /my-accounts/{id}/balance -- Response: Get balance by account ID </li>
         <li> Method: POST -- Route: /transfer -- Response: Make a transaction between accounts </li> 
       </ul>    

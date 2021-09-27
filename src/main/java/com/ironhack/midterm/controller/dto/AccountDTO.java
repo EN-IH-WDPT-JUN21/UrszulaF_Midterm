@@ -23,32 +23,51 @@ import java.util.List;
 @NoArgsConstructor
 public abstract class AccountDTO {
 
-    @Digits(integer = 19, fraction = 2, message = "Maximum balance amount is 19, no decimals.")
-    private String balanceAmount;
 
-    private String balanceCurrency;
+    protected Money balance;
 
-    private String secretKey;
+    protected String secretKey;
 
-    @Column(updatable=false)
-    @CreationTimestamp
-    private String creationDate;
+    @ManyToOne
+    @JoinColumn(name = "primaryOwner_id", referencedColumnName = "id")
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    protected AccountHolder primaryOwner;
 
-    private String statusString;
+    @ManyToMany
+    @JoinTable(
+            name="account_secondaryOwners",
+            joinColumns = {@JoinColumn(name="account_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name="secondaryOwner_id", referencedColumnName = "id")}
+    )
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    protected List<AccountHolder> secondaryOwners;
 
-    public String getStatusString() {
-        return statusString;
+//    @Pattern(regexp = "^((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$", message = "Date format must be YYYY-MM-DDTHH:MM:SS")
+    protected String creationDate;
+
+    protected Status status;
+
+    @OneToMany(mappedBy = "senderAccount", cascade = CascadeType.ALL)
+    private List<Transaction> transactionsSend;
+
+    @OneToMany(mappedBy = "recipientAccount", cascade = CascadeType.ALL)
+    private List<Transaction> transactionsReceived;
+
+
+    public AccountDTO(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners) {
+        this.balance = balance;
+        this.secretKey = secretKey;
+        this.primaryOwner = primaryOwner;
+        this.secondaryOwners = secondaryOwners;
+        this.status = Status.ACTIVE;
     }
 
-    public void setStatusString(String statusString) {
-        this.statusString = statusString;
+
+    public AccountDTO(Money balance, String secretKey, AccountHolder primaryOwner) {
+        this.balance = balance;
+        this.secretKey = secretKey;
+        this.primaryOwner = primaryOwner;
+        this.status = Status.ACTIVE;
     }
 
-    public Status getStatus() {
-        return Status.valueOf(statusString);
-    }
-
-    public void setStatus(Status status) {
-        this.statusString = status.toString();
-    }
 }

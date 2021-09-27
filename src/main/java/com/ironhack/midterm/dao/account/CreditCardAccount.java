@@ -1,5 +1,10 @@
 package com.ironhack.midterm.dao.account;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.ironhack.midterm.dao.account.Account;
 import com.ironhack.midterm.dao.user.AccountHolder;
 import com.ironhack.midterm.enums.Status;
@@ -40,6 +45,9 @@ public class CreditCardAccount extends Account {
     @Column(columnDefinition = "decimal(7,4) default 0.2")
     private BigDecimal interestRate;
 
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
     @UpdateTimestamp
     private LocalDateTime lastInterestApplied;
 
@@ -74,7 +82,7 @@ public class CreditCardAccount extends Account {
         if(creditLimit.getAmount().compareTo(BigDecimal.ZERO)<0){
             System.out.println("Credit limit set to default " + Constants.CCARD_ACC_DEFAULT_CREDIT_LIMIT);
             this.creditLimit = new Money(Constants.CCARD_ACC_DEFAULT_CREDIT_LIMIT);
-        } else if(creditLimit.getAmount().compareTo(Constants.SAVINGS_ACC_MIN_MIN_BALANCE)>0){
+        } else if(creditLimit.getAmount().compareTo(Constants.CCARD_ACC_MAX_CREDIT_LIMIT)>0){
             System.out.println("Credit limit can't be higher than " + Constants.CCARD_ACC_MAX_CREDIT_LIMIT);
             System.out.println("Credit limit set to " + Constants.CCARD_ACC_MAX_CREDIT_LIMIT);
             this.creditLimit = new Money(Constants.CCARD_ACC_MAX_CREDIT_LIMIT);

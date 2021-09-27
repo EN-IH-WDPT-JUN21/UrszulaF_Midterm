@@ -1,6 +1,13 @@
 package com.ironhack.midterm.dao.account;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.ironhack.midterm.dao.user.AccountHolder;
 import com.ironhack.midterm.enums.Status;
 import com.ironhack.midterm.service.impl.Freezable;
@@ -60,12 +67,16 @@ public abstract class Account implements Freezable {
     protected List<AccountHolder> secondaryOwners;
 
     @OneToMany(mappedBy = "senderAccount", cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Transaction> transactionsSend;
 
     @OneToMany(mappedBy = "recipientAccount", cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Transaction> transactionsReceived;
 
-
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
     @Column(updatable=false)
     @CreationTimestamp
     protected LocalDateTime creationDate;
@@ -83,12 +94,13 @@ public abstract class Account implements Freezable {
         this.status = Status.ACTIVE;
     }
 
-//    public Account(Money balance, String secretKey, AccountHolder primaryOwner) {
-//        this.balance = balance;
-//        this.secretKey = secretKey;
-//        this.primaryOwner = primaryOwner;
-//        this.creationDate = LocalDateTime.now();
-//        this.status = Status.ACTIVE;
-//    }
+
+    public Account(Money balance, String secretKey, AccountHolder primaryOwner) {
+        this.balance = balance;
+        this.secretKey = secretKey;
+        this.primaryOwner = primaryOwner;
+        this.creationDate = LocalDateTime.now();
+        this.status = Status.ACTIVE;
+    }
 
 }

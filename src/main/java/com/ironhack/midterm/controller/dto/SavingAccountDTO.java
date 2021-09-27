@@ -1,6 +1,11 @@
 package com.ironhack.midterm.controller.dto;
 
+import com.ironhack.midterm.dao.account.Account;
+import com.ironhack.midterm.dao.user.AccountHolder;
 import com.ironhack.midterm.enums.Status;
+import com.ironhack.midterm.service.impl.Freezable;
+import com.ironhack.midterm.service.impl.Penalizable;
+import com.ironhack.midterm.utils.Constants;
 import com.ironhack.midterm.utils.Money;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,60 +20,73 @@ import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SavingAccountDTO{
+public class SavingAccountDTO extends AccountDTO{
 
-    @Digits(integer = 19, fraction = 2, message = "Maximum balance amount is 19, no decimals.")
-    private String balanceAmount;
+    private Money minimumBalance;
+    
 
-    private String balanceCurrency;
+    private BigDecimal interestRate;
 
-    private String secretKey;
+//    @Pattern(regexp = "^((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$", message = "Date format must be YYYY-MM-DD HH:MM:SS.000000")
+    private String lastInterestApplied;
 
-    @Column(updatable=false)
-    @CreationTimestamp
-    private String creationDate;
-
-    private String statusString;
-
-    public String getStatusString() {
-        return statusString;
-    }
-
-    public void setStatusString(String statusString) {
-        this.statusString = statusString;
-    }
-
-    public Status getStatus() {
-        return Status.valueOf(statusString);
-    }
-
-    public void setStatus(Status status) {
-        this.statusString = status.toString();
-    }
-
-    @Digits(integer = 19, fraction = 2, message = "Maximum balance amount is 19, no decimals.")
-    private String  minimumBalanceAmount;
-
-    private String  minimumBalanceCurrency;
-
-    @DecimalMax(value="0.50")
-    @Digits(integer=1, fraction=4)
-    private String interestRate;
-
-    @UpdateTimestamp
-    private LocalDateTime lastInterestApplied;
-
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name="amount",column=@Column(name="penalty_fee_amount")),
-            @AttributeOverride(name="currency",column=@Column(name="penalty_fee_currency"))
-    })
     private Money penaltyFee;
+
+    public SavingAccountDTO(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, Money minimumBalance, BigDecimal interestRate) {
+        super(balance, secretKey, primaryOwner, secondaryOwners);
+        this.penaltyFee = new Money(BigDecimal.ZERO);
+        setMinimumBalance(minimumBalance);
+        setInterestRate(interestRate);
+    }
+
+    public SavingAccountDTO(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, BigDecimal interestRate) {
+        super(balance, secretKey, primaryOwner, secondaryOwners);
+        this.penaltyFee = new Money(BigDecimal.ZERO);
+        this.minimumBalance = new Money(Constants.SAVINGS_ACC_DEFAULT_MIN_BALANCE);
+        setInterestRate(interestRate);
+    }
+
+    public SavingAccountDTO(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners) {
+        super(balance, secretKey, primaryOwner, secondaryOwners);
+        this.penaltyFee = new Money(BigDecimal.ZERO);
+        this.minimumBalance = new Money(Constants.SAVINGS_ACC_DEFAULT_MIN_BALANCE);
+        this.interestRate = Constants.SAVINGS_ACC_DEFAULT_INTEREST_RATE;
+//        this.lastInterestApplied = LocalDateTime.now();
+    }
+
+    public SavingAccountDTO(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, Money minimumBalance) {
+        super(balance, secretKey, primaryOwner, secondaryOwners);
+        this.penaltyFee = new Money(BigDecimal.ZERO);
+        setMinimumBalance(minimumBalance);
+        this.interestRate = Constants.SAVINGS_ACC_DEFAULT_INTEREST_RATE;
+//        this.lastInterestApplied = LocalDateTime.now();
+    }
+
+    public SavingAccountDTO(Money balance, String secretKey, AccountHolder primaryOwner) {
+        super(balance, secretKey, primaryOwner);
+        this.penaltyFee = new Money(BigDecimal.ZERO);
+        this.minimumBalance = new Money(Constants.SAVINGS_ACC_DEFAULT_MIN_BALANCE);
+        this.interestRate = Constants.SAVINGS_ACC_DEFAULT_INTEREST_RATE;
+//        this.lastInterestApplied = LocalDateTime.now();
+    }
+
+    public SavingAccountDTO(Money balance, String secretKey, AccountHolder primaryOwner, Money minimumBalance) {
+        super(balance, secretKey, primaryOwner);
+        this.penaltyFee = new Money(BigDecimal.ZERO);
+        setMinimumBalance(minimumBalance);
+        this.interestRate = Constants.SAVINGS_ACC_DEFAULT_INTEREST_RATE;
+//        this.lastInterestApplied = LocalDateTime.now();
+    }
+
+
+    
 }

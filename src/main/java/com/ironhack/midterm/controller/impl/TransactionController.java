@@ -1,6 +1,7 @@
 package com.ironhack.midterm.controller.impl;
 
 import com.ironhack.midterm.controller.dto.TransactionDTO;
+import com.ironhack.midterm.controller.interfaces.ITransactionController;
 import com.ironhack.midterm.dao.account.Account;
 import com.ironhack.midterm.dao.account.Transaction;
 import com.ironhack.midterm.repository.*;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class TransactionController {
+public class TransactionController implements ITransactionController {
     @Autowired
     AccountRepository accountRepository;
 
@@ -60,7 +61,7 @@ public class TransactionController {
 
     @PostMapping("/transfer")
     @ResponseStatus(HttpStatus.CREATED)
-    public void transfer(@RequestBody @Valid String name, @RequestBody @Valid TransactionDTO transactionDTO){
+    public void transfer(@RequestBody @Valid TransactionDTO transactionDTO){
 
 
         transactionService.transfer(transactionDTO.getSenderAccountId(), transactionDTO.getRecipientAccountId(), transactionDTO);

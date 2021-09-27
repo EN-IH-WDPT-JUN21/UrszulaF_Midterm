@@ -9,7 +9,9 @@ select * from student_checking_account;
 select * from checking_account;
 select * from credit_card_account;
 select * from saving_account;
-select * from account_secondary_owners;*/
+select * from account_secondary_owners;
+select * from transaction;
+*/
 
 INSERT INTO role (name) VALUES
 ("ACCOUNT_HOLDER"),
@@ -48,4 +50,7 @@ INSERT INTO account_secondary_owners (`account_id`,`secondary_owner_id`) VALUES
 (2,1),
 (3,5),
 (3,1);
+INSERT INTO transaction (`amount`, `currency`, `time_stamp`,`transaction_type`,`recipient_account_id`,`sender_account_id`) VALUES
+(100, 'USD','2020-04-02', 'TRANSFER', 2,1),
+(200, 'USD','2020-04-02', 'TRANSFER', 4,3);
 

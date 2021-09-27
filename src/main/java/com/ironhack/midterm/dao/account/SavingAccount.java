@@ -1,5 +1,10 @@
 package com.ironhack.midterm.dao.account;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.ironhack.midterm.dao.account.Account;
 import com.ironhack.midterm.dao.user.AccountHolder;
 import com.ironhack.midterm.enums.Status;
@@ -43,6 +48,9 @@ public class SavingAccount extends Account implements Freezable, Penalizable {
     @Column(columnDefinition = "decimal(5,4) default 0.0025")
     private BigDecimal interestRate;
 
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
     @UpdateTimestamp
     private LocalDateTime lastInterestApplied;
 
@@ -82,6 +90,38 @@ public class SavingAccount extends Account implements Freezable, Penalizable {
         this.interestRate = Constants.SAVINGS_ACC_DEFAULT_INTEREST_RATE;
         this.lastInterestApplied = LocalDateTime.now();
     }
+
+//
+public SavingAccount(Money balance, String secretKey, AccountHolder primaryOwner, Money minimumBalance, BigDecimal interestRate) {
+    super(balance, secretKey, primaryOwner);
+    this.penaltyFee = new Money(BigDecimal.ZERO);
+    setMinimumBalance(minimumBalance);
+    setInterestRate(interestRate);
+}
+
+    public SavingAccount(Money balance, String secretKey, AccountHolder primaryOwner, BigDecimal interestRate) {
+        super(balance, secretKey, primaryOwner);
+        this.penaltyFee = new Money(BigDecimal.ZERO);
+        this.minimumBalance = new Money(Constants.SAVINGS_ACC_DEFAULT_MIN_BALANCE);
+        setInterestRate(interestRate);
+    }
+
+    public SavingAccount(Money balance, String secretKey, AccountHolder primaryOwner) {
+        super(balance, secretKey, primaryOwner);
+        this.penaltyFee = new Money(BigDecimal.ZERO);
+        this.minimumBalance = new Money(Constants.SAVINGS_ACC_DEFAULT_MIN_BALANCE);
+        this.interestRate = Constants.SAVINGS_ACC_DEFAULT_INTEREST_RATE;
+        this.lastInterestApplied = LocalDateTime.now();
+    }
+
+    public SavingAccount(Money balance, String secretKey, AccountHolder primaryOwner, Money minimumBalance) {
+        super(balance, secretKey, primaryOwner);
+        this.penaltyFee = new Money(BigDecimal.ZERO);
+        setMinimumBalance(minimumBalance);
+        this.interestRate = Constants.SAVINGS_ACC_DEFAULT_INTEREST_RATE;
+        this.lastInterestApplied = LocalDateTime.now();
+    }
+
 
 
     public void setMinimumBalance(Money minimumBalance) {
