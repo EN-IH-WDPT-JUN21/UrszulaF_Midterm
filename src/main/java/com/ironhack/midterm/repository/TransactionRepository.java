@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,5 +22,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query(value = "SELECT SUM(t.amount) FROM transaction t WHERE sender_account_id = :id AND t.time_stamp > date_sub(now(), interval 24 HOUR) LIMIT 1", nativeQuery = true)
     Optional<BigDecimal> getSumLastTransactions(@Param("id") Long id);
 
-
+    List<Transaction> findBySenderAccountId(Long senderAccountId);
 }

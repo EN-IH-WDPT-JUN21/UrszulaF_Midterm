@@ -6,14 +6,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import java.io.Serializable;
 import java.math.RoundingMode;
 import java.math.BigDecimal;
 import java.util.Currency;
 
-
-public class Money implements Serializable {
+@Embeddable
+public class Money {
 
     private static final Currency USD = Currency.getInstance("USD");
     private static final RoundingMode DEFAULT_ROUNDING = RoundingMode.HALF_EVEN;

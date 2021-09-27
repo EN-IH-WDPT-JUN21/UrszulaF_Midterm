@@ -5,6 +5,7 @@ import com.ironhack.midterm.dao.account.*;
 import com.ironhack.midterm.enums.Status;
 import com.ironhack.midterm.enums.TransactionType;
 import com.ironhack.midterm.repository.*;
+import com.ironhack.midterm.service.interfaces.ITransactionService;
 import com.ironhack.midterm.utils.Constants;
 import com.ironhack.midterm.utils.InterestRate;
 import com.ironhack.midterm.utils.Money;
@@ -15,10 +16,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TransactionService {
+public class TransactionService implements ITransactionService {
     @Autowired
     AccountRepository accountRepository;
 
@@ -40,16 +42,24 @@ public class TransactionService {
     @Autowired
     InterestRate interestRate;
 
-
+    //method to check the balance of the transaction
+    public List<Transaction> getMyTransactions(Long id){
+        List<Transaction> senderAccountTransactions = transactionRepository.findBySenderAccountId(id);
+        if(senderAccountTransactions.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no transactions for this transaction holder id");
+        }else{
+            return senderAccountTransactions;
+        }
+    }
 
     //deposit method
     public void deposit(Long id, Money amount){
         Optional<Account> storedAccount = accountRepository.findById(id);
         if(storedAccount.isEmpty()){
-            System.out.println("There is no account with this id");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no account with this id");
         }else{
             if (amount.getAmount().compareTo(BigDecimal.ZERO)<=0) {
-                System.out.println("Amount to be deposited should be positive");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount to be deposited should be positive");
             }else{
                 Money balanceBefore = storedAccount.get().getBalance();
                 BigDecimal balanceAfter = balanceBefore.increaseAmount(amount);
@@ -67,18 +77,18 @@ public class TransactionService {
     public void withdraw(Long id, Money amount){
         Optional<Account> storedAccount = accountRepository.findById(id);
         if(storedAccount.isEmpty()){
-            System.out.println("There is no account with this id");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no account with this id");
         }else{
 //                check fraud
             checkFraud(storedAccount.get());
             if (amount.getAmount().compareTo(BigDecimal.ZERO)<=0) {
-                System.out.println("Amount to be withdrawn should be positive");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount to be withdrawn should be positive");
             }else {
 
                 Money balanceBefore = storedAccount.get().getBalance();
                 BigDecimal balanceAfter = balanceBefore.decreaseAmount(amount);
                 if (balanceAfter.compareTo(BigDecimal.ZERO) < 0) {
-                    System.out.println("Insufficient Balance");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient Balance");
                 } else {
                     storedAccount.get().setBalance(new Money(balanceAfter));
                     Transaction transaction = new Transaction(TransactionType.WITHDRAWAL, amount, storedAccount.get());
@@ -95,19 +105,19 @@ public class TransactionService {
     public void withdrawCC(Long id, Money amount){
         Optional<CreditCardAccount> storedCreditCardAccount = creditCardAccountRepository.findById(id);
         if(storedCreditCardAccount.isEmpty()){
-            System.out.println("There is no creditCardAccount with this id");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no creditCardAccount with this id");
         }else{
             //                check fraud
             checkFraud(storedCreditCardAccount.get());
             if (amount.getAmount().compareTo(BigDecimal.ZERO)<=0) {
-                System.out.println("Amount to be withdrawn should be positive");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount to be withdrawn should be positive");
             }else {
                 //            interest rate applied
                 interestRate.applyInterestRate(storedCreditCardAccount.get());
                 Money balanceBefore = storedCreditCardAccount.get().getBalance();
                 BigDecimal balanceAfter = balanceBefore.decreaseAmount(amount);
                 if (balanceAfter.compareTo(BigDecimal.ZERO) < 0) {
-                    System.out.println("Insufficient Balance");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient Balance");
                 } else {
                     storedCreditCardAccount.get().setBalance(new Money(balanceAfter));
                     Transaction transaction = new Transaction(TransactionType.WITHDRAWAL, amount, storedCreditCardAccount.get());
@@ -124,19 +134,19 @@ public class TransactionService {
     public void withdrawSA(Long id, Money amount){
         Optional<SavingAccount> storedSavingAccount = savingAccountRepository.findById(id);
         if(storedSavingAccount.isEmpty()){
-            System.out.println("There is no savingAccount with this id");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no savingAccount with this id");
         }else{
             //                check fraud
             checkFraud(storedSavingAccount.get());
             if (amount.getAmount().compareTo(BigDecimal.ZERO)<=0) {
-                System.out.println("Amount to be withdrawn should be positive");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount to be withdrawn should be positive");
             }else {
                 //            interest rate applied
                 interestRate.applyInterestRate(storedSavingAccount.get());
                 Money balanceBefore = storedSavingAccount.get().getBalance();
                 BigDecimal balanceAfter = balanceBefore.decreaseAmount(amount);
                 if (balanceAfter.compareTo(BigDecimal.ZERO) < 0) {
-                    System.out.println("Insufficient Balance");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient Balance");
                 } else {
                     storedSavingAccount.get().setBalance(new Money(balanceAfter));
                     Transaction transaction = new Transaction(TransactionType.WITHDRAWAL, amount, storedSavingAccount.get());
@@ -151,9 +161,11 @@ public class TransactionService {
 
     //transfer method
     public void transfer(Long senderAccountId, Long recipientAccountId, TransactionDTO transactionDTO){
+
+        ////check user
         Optional<Account> senderAccount = accountRepository.findById(senderAccountId);
         if(senderAccount.isEmpty()){
-            System.out.println("There is no account with this id");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no account with this id");
         }else{
             //                check fraud
             checkFraud(senderAccount.get());

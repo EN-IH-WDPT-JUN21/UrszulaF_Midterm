@@ -18,4 +18,7 @@ public class Admin extends User {
 //
 //    private String name;
 
+    public Admin(String username, String password, Role role) {
+        super(username, password, role);
+    }
 }

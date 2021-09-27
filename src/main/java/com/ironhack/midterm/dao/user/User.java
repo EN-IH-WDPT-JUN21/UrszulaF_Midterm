@@ -1,5 +1,6 @@
 package com.ironhack.midterm.dao.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ironhack.midterm.dao.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public abstract class User {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     protected Role role;
 
     public User(String username, String password, Role role) {

@@ -2,6 +2,13 @@ package com.ironhack.midterm.dao.user;
 
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.ironhack.midterm.dao.account.Address;
 import com.ironhack.midterm.dao.account.Account;
 import lombok.AllArgsConstructor;
@@ -26,6 +33,10 @@ public class AccountHolder extends User {
 
 //    private String name;
 
+
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate DateOfBirth;
 
     @Embedded
@@ -34,11 +45,13 @@ public class AccountHolder extends User {
     private String mailingAddress;
 
     @OneToMany(mappedBy = "primaryOwner", cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Account> accountsPrimaryOwner;
 
 //    @OneToMany(mappedBy = "secondaryOwner")
 //    private List<Account> accountsS;
     @ManyToMany(mappedBy = "secondaryOwners", cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Account> accountsSecondaryOwner;
 
 
@@ -53,5 +66,12 @@ public class AccountHolder extends User {
         } else {
             return 0;
         }
+    }
+
+    public AccountHolder(String username, String password, Role role, LocalDate dateOfBirth, Address primaryAddress, String mailingAddress) {
+        super(username, password, role);
+        DateOfBirth = dateOfBirth;
+        this.primaryAddress = primaryAddress;
+        this.mailingAddress = mailingAddress;
     }
 }

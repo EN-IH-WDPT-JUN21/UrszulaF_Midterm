@@ -10,6 +10,6 @@ public class PasswordUtil {
     }
     public static void main(String[] args) {
         System.out.println("Encrypted password:");
-        System.out.println(encryptedPassword("password"));
+        System.out.println(encryptedPassword("123456"));
     }
 }

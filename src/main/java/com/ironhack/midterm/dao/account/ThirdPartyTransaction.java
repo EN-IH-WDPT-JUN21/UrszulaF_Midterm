@@ -27,6 +27,7 @@ public class ThirdPartyTransaction {
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
 
+    @Embedded
     private Money amount;
 
     private LocalDateTime timeStamp;

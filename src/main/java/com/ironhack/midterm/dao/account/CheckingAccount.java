@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -26,16 +26,31 @@ import java.util.List;
 public class CheckingAccount extends Account implements Freezable, Penalizable {
 
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="amount",column=@Column(name="minimum_balance_amount")),
+            @AttributeOverride(name="currency",column=@Column(name="minimum_balance_currency"))
+    })
     private Money minimumBalance;
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="amount",column=@Column(name="monthly_maintenance_fee_amount")),
+            @AttributeOverride(name="currency",column=@Column(name="monthly_maintenance_fee_currency"))
+    })
     private Money monthlyMaintenanceFee;
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="amount",column=@Column(name="penalty_fee_amount")),
+            @AttributeOverride(name="currency",column=@Column(name="penalty_fee_currency"))
+    })
     private Money penaltyFee;
 
     public CheckingAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners) {
         super(balance, secretKey, primaryOwner, secondaryOwners);
-        this.minimumBalance = new Money(Constants.CHECKING_ACC_DEFAULT_MONTHLY_FEE);
-        this.monthlyMaintenanceFee = new Money(Constants.CHECKING_ACC_MIN_BALANCE);
+        this.minimumBalance = new Money(Constants.CHECKING_ACC_MIN_BALANCE);
+        this.monthlyMaintenanceFee = new Money(Constants.CHECKING_ACC_DEFAULT_MONTHLY_FEE);
         this.penaltyFee = new Money(BigDecimal.ZERO);
         setPrimaryOwner(primaryOwner);
     }
