@@ -11,6 +11,8 @@ select * from credit_card_account;
 select * from saving_account;
 select * from account_secondary_owners;
 select * from transaction;
+select * from transaction;
+select * from third_party;
 */
 
 INSERT INTO role (name) VALUES
@@ -52,5 +54,12 @@ INSERT INTO account_secondary_owners (`account_id`,`secondary_owner_id`) VALUES
 (3,1);
 INSERT INTO transaction (`amount`, `currency`, `time_stamp`,`transaction_type`,`recipient_account_id`,`sender_account_id`) VALUES
 (100, 'USD','2020-04-02', 'TRANSFER', 2,1),
-(200, 'USD','2020-04-02', 'TRANSFER', 4,3);
+(200, 'USD','2021-04-02', 'TRANSFER', 4,3);
+INSERT INTO third_party (`hashed_key`,`name`) VALUES
+('secret','Jola'),
+('mine','Jerzy');
+INSERT INTO third_party_transaction (`amount`, `currency`, `time_stamp`,`transaction_type`,`recipient_account_id`,`third_party_id`) VALUES
+(300, 'USD','2000-04-02', 'TRANSFER', 2,1),
+(400, 'USD','2010-04-02', 'TRANSFER', 4,2);
+
 

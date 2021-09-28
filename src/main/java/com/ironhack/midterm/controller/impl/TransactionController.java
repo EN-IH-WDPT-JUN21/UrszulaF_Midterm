@@ -61,10 +61,10 @@ public class TransactionController implements ITransactionController {
 
     @PostMapping("/transfer")
     @ResponseStatus(HttpStatus.CREATED)
-    public void transfer(@RequestBody @Valid TransactionDTO transactionDTO){
+    public Transaction transfer(@RequestBody @Valid TransactionDTO transactionDTO){
 
 
-        transactionService.transfer(transactionDTO.getSenderAccountId(), transactionDTO.getRecipientAccountId(), transactionDTO);
+        return transactionService.transfer(transactionDTO);
     }
 
 }

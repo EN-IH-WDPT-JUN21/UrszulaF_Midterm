@@ -9,6 +9,6 @@ import java.util.List;
 public interface ITransactionService {
     void deposit(Long id, Money amount);
     void withdraw(Long id, Money amount);
-    void transfer(Long senderTransactionId, Long recipientTransactionId, TransactionDTO transactionDTO);
+    Transaction transfer(TransactionDTO transactionDTO);
     List<Transaction> getMyTransactions(Long id);
 }

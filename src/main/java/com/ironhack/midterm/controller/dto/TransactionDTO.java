@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransactionDTO {
-    private Long id;
 
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
@@ -39,22 +38,16 @@ public class TransactionDTO {
     @CreationTimestamp
     private LocalDateTime timeStamp;
 
-    private Account senderAccount;
+    private Long senderAccountId;
 
-    private Account recipientAccount;
+    private Long recipientAccountId;
 
-    public Long getSenderAccountId() {
-        return senderAccount.getId();
-    }
 
-    public Long getRecipientAccountId() {
-        return recipientAccount.getId();
-    }
 
-    public TransactionDTO(TransactionType transactionType, Money amount, Account senderAccount, Account recipientAccount) {
+    public TransactionDTO(TransactionType transactionType, Money amount, Long senderAccountId, Long recipientAccountId) {
         this.transactionType = transactionType;
         this.amount = amount;
-        this.senderAccount = senderAccount;
-        this.recipientAccount = recipientAccount;
+        this.senderAccountId = senderAccountId;
+        this.recipientAccountId = recipientAccountId;
     }
 }

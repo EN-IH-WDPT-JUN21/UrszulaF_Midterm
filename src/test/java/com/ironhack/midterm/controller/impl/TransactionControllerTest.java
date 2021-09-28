@@ -21,7 +21,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -125,8 +127,11 @@ class TransactionControllerTest {
         studentCheckingAccountRepository.save(studentCheckingAccount1);
         List<Account> accounts = accountRepository.saveAll(List.of(checkingAccount1, creditCardAccount1, savingAccount1, studentCheckingAccount1));
         transaction1 = new Transaction(TransactionType.TRANSFER, new Money(new BigDecimal(100)), checkingAccount1, creditCardAccount1);
+        transaction1.setTimeStamp(LocalDateTime.of(2021,9,20,12,0));
         transaction2 = new Transaction(TransactionType.TRANSFER, new Money(new BigDecimal(200)), savingAccount1, studentCheckingAccount1);
+        transaction2.setTimeStamp(LocalDateTime.of(2021,8,27,12,0));
         transactionRepository.saveAll(List.of(transaction1,transaction2));
+
     }
 
     @AfterEach
@@ -149,13 +154,20 @@ class TransactionControllerTest {
 
     @Test
     void transfer() throws Exception{
-        TransactionDTO transaction1 = new TransactionDTO(TransactionType.TRANSFER, new Money(new BigDecimal(300)), checkingAccount1, creditCardAccount1);
-        String body = objectMapper.writeValueAsString(checkingAccount1);
+        BigDecimal senderAccountBalance0 = creditCardAccount1.getBalance().getAmount();
+        BigDecimal recipientAccountBalance0 = studentCheckingAccount1.getBalance().getAmount();
+        TransactionDTO transaction1 = new TransactionDTO(TransactionType.TRANSFER, new Money(new BigDecimal(50)), creditCardAccount1.getId(), studentCheckingAccount1.getId());
+        String body = objectMapper.writeValueAsString(transaction1);
         MvcResult result = mockMvc.perform(
                 post("/transfer")
                         .content(body)
                         .contentType(MediaType.APPLICATION_JSON)
         ).andDo(print()).andExpect(status().isCreated()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("300"));
+        assertTrue(result.getResponse().getContentAsString().contains("50"));
+        BigDecimal transfer = transaction1.getAmount().getAmount();
+        Account checkAccount= accountRepository.findById(transaction1.getSenderAccountId()).get();
+        BigDecimal senderAccountBalance1 = checkAccount.getBalance().getAmount();
+        BigDecimal recipientAccountBalance1 = studentCheckingAccount1.getBalance().getAmount();
+        assertEquals(transfer, senderAccountBalance0.subtract(senderAccountBalance1));
     }
 }
