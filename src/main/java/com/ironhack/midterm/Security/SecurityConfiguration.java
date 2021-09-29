@@ -54,8 +54,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.httpBasic();
 
         http.authorizeRequests()
-                .mvcMatchers(HttpMethod.POST, "/third-party/receive-money").permitAll()
-                .mvcMatchers(HttpMethod.POST, "/third-party/send-money").permitAll()
+                .mvcMatchers(HttpMethod.GET, "/third-party/receive-money/**").permitAll()
+                .mvcMatchers(HttpMethod.POST, "/third-party/send-money/**").hasRole("ACCOUNT_HOLDER")
                 .antMatchers(HttpMethod.GET, "/my-accounts/**").hasRole("ACCOUNT_HOLDER")
                 .antMatchers(HttpMethod.POST, "/transfer").hasAnyRole("ACCOUNT_HOLDER")
                 .mvcMatchers(HttpMethod.POST, "/**").hasRole("ADMIN")

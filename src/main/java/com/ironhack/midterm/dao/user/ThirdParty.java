@@ -1,7 +1,8 @@
 package com.ironhack.midterm.dao.user;
 
-import com.ironhack.midterm.dao.account.ThirdPartyTransaction;
-import com.ironhack.midterm.dao.account.Transaction;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ironhack.midterm.dao.account.ThirdPartyTransactionSend;
+import com.ironhack.midterm.dao.account.ThirdPartyTransactionReceive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,16 @@ public class ThirdParty{
 
     private String name;
 
-    @OneToMany(mappedBy = "thirdParty", cascade = CascadeType.ALL)
-    private List<ThirdPartyTransaction> transactionsSend;
+    @OneToMany(mappedBy = "senderThirdParty", cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private List<ThirdPartyTransactionSend> thirdPartyTransactionsSend;
+
+    @OneToMany(mappedBy = "recipientThirdParty", cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private List<ThirdPartyTransactionReceive> thirdPartyTransactionReceived;
+
+    public ThirdParty(String hashedKey, String name) {
+        this.hashedKey = hashedKey;
+        this.name = name;
+    }
 }

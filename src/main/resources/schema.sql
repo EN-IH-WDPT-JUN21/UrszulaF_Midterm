@@ -19,8 +19,12 @@ select * from checking_account;
 select * from credit_card_account;
 select * from saving_account;
 select * from account_secondary_owners;
+select * from transaction;
+select * from third_party_transaction_send;
+select * from third_party;
+select * from third_party_transaction_receive;
 */
-/*drop tables doctor, patient;*/
+/*drop tables third_party, third_party_transaction_send;*/
 
 /*
 DROP TABLE if exists role;
@@ -35,7 +39,8 @@ DROP TABLE if exists credit_card_account;
 DROP TABLE if exists saving_account;
 DROP TABLE if exists account_secondary_owners;
 DROP TABLE if exists transaction;
-DROP TABLE if exists third_party_transaction;
+DROP TABLE if exists third_party_transaction_send;
+DROP TABLE if exists third_party_transaction_receive;
 
 CREATE TABLE `role` (
     `id` BIGINT AUTO_INCREMENT NOT NULL,
@@ -148,15 +153,31 @@ CREATE TABLE `transaction` (
 	FOREIGN KEY (`sender_account_id`) REFERENCES `account` (`id`)
 );
 
-CREATE TABLE `third_party_transaction` (
+CREATE TABLE `third_party_transaction_send` (
     `id` BIGINT AUTO_INCREMENT NOT NULL,
   `amount` decimal(19,2),
   `currency` varchar(255) DEFAULT 'USD',
    `time_stamp` datetime(6),
   `transaction_type` VARCHAR(255),
+  `recipient_account_id` bigint,
+  `sender_third_party_id` bigint,
     	PRIMARY KEY (`id`),
     FOREIGN KEY (`recipient_account_id`) REFERENCES `account` (`id`),
-	FOREIGN KEY (`third_party_id`) REFERENCES `third_party` (`id`)
+	FOREIGN KEY (`sender_third_party_id`) REFERENCES `third_party` (`id`)
 );
+
+CREATE TABLE `third_party_transaction_receive` (
+    `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `amount` decimal(19,2),
+  `currency` varchar(255) DEFAULT 'USD',
+   `time_stamp` datetime(6),
+  `transaction_type` VARCHAR(255),
+    `recipient_third_party_id` bigint,
+  `sender_account_id` bigint,
+    	PRIMARY KEY (`id`),
+    FOREIGN KEY (`sender_account_id`) REFERENCES `account` (`id`),
+	FOREIGN KEY (`recipient_third_party_id`) REFERENCES `third_party` (`id`)
+);
+
 */
 

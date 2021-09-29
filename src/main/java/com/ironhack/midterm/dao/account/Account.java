@@ -77,8 +77,8 @@ public abstract class Account implements Freezable {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
-    @Column(updatable=false)
-    @CreationTimestamp
+//    @Column(updatable=false)
+//    @CreationTimestamp
     protected LocalDateTime creationDate;
 
     @Column(columnDefinition = "varchar(255) default 'ACTIVE'")
@@ -102,5 +102,21 @@ public abstract class Account implements Freezable {
         this.creationDate = LocalDateTime.now();
         this.status = Status.ACTIVE;
     }
+//for creating accounts with past date - for testing purposes
+    public Account(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, LocalDateTime creationDate) {
+        this.balance = balance;
+        this.secretKey = secretKey;
+        this.primaryOwner = primaryOwner;
+        this.secondaryOwners = secondaryOwners;
+        this.creationDate = creationDate;
+        this.status = Status.ACTIVE;
+    }
 
+    public Account(Money balance, String secretKey, AccountHolder primaryOwner, LocalDateTime creationDate) {
+        this.balance = balance;
+        this.secretKey = secretKey;
+        this.primaryOwner = primaryOwner;
+        this.creationDate = creationDate;
+        this.status = Status.ACTIVE;
+    }
 }

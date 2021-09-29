@@ -22,9 +22,14 @@ import java.util.List;
 
 @Getter
 @Setter
-//@AllArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor
-public class AccountHolderDTO extends User {
+public class AccountHolderDTO {
+
+    protected String username;
+    protected String password;
+
+    private Long roleId;
 
     @Pattern(regexp = "^((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$", message = "Date format must be YYYY-MM-DD")
     private String dateOfBirth;
@@ -34,10 +39,5 @@ public class AccountHolderDTO extends User {
 
     private String mailingAddress;
 
-    public AccountHolderDTO(String username, String password, Role role, String dateOfBirth, Address primaryAddress, String mailingAddress) {
-        super(username, password, role);
-        this.dateOfBirth = dateOfBirth;
-        this.primaryAddress = primaryAddress;
-        this.mailingAddress = mailingAddress;
-    }
+
 }

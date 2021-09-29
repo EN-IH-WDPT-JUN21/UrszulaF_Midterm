@@ -185,12 +185,10 @@ Depending on the route you are trying to access, you will need different privile
 <ol>
   <li> Admin routes:
       <ul> 
-        <li> accounts: </li>
+        <li> Accounts: </li>
         <ul>
         <li> Method: GET -- Route: /accounts -- Response: Get all accounts </li>
         <li> Method: GET -- Route: /accounts/{id} -- Response: Get account by account ID </li>
-        <li> Method: GET -- Route: /admin/account/{id}/balance -- Response: Get balance by account ID </li>
-        <li> Method: GET -- Route: /admin/account/{id}/accounts -- Response: Get all accounts of a user by Account Holder ID </li>
         <li> Method: PATCH -- Route: /accounts/change-balance/{id} -- Response: Update balance amount by account ID </li>
         <li> Method: PATCH -- Route: /accounts/change-status/{id} -- Response: Update status by account ID </li>
         <li> Method: GET -- Route: /checking-accounts -- Response: Get all checking accounts </li>
@@ -201,6 +199,9 @@ Depending on the route you are trying to access, you will need different privile
         <li> Method: POST -- Route: /saving-account/new -- Response: Create a new saving account </li>   
         <li> Method: GET -- Route: /student-checking-accounts -- Response: Get all student checking accounts </li>
         <li> Method: POST -- Route: /student-checking-account/new -- Response: Create a new student checking account </li>   
+        <li> Method: GET -- Route: /transactions -- Response: Get all transactions (internal) </li>
+        <li> Method: GET -- Route: /third-party-send-transactions -- Response: Get all third party send transactions </li>
+        <li> Method: GET -- Route: /third-party-receive-transactions -- Response: Get all third party send transactions </li>
         </ul>        
         <li> Account Holders: </li>
         <ul>        
@@ -210,8 +211,8 @@ Depending on the route you are trying to access, you will need different privile
         </ul>        
         <li> Third Parties: </li>
         <ul>        
-        <li> Method: GET -- Route: /admin/third-parties -- Response: Get all Third Parties </li>
-        <li> Method: POST -- Route: /admin/third-parties/new -- Response: Create a new Third Party </li>    
+        <li> Method: GET -- Route: /third-parties -- Response: Get all Third Parties </li>
+        <li> Method: POST -- Route: /third-parties/new -- Response: Create a new Third Party </li>    
         </ul>        
       </ul>    
   </li>
@@ -221,6 +222,18 @@ Depending on the route you are trying to access, you will need different privile
         <li> Method: GET -- Route: /my-accounts/secondary -- Response: Get all secondary accounts of a user by Account Holder ID </li>
         <li> Method: GET -- Route: /my-accounts/{id}/balance -- Response: Get balance by account ID </li>
         <li> Method: POST -- Route: /transfer -- Response: Make a transaction between accounts </li> 
+        <li> Method: POST -- Route: /third-party/send-money/{hashed-key} -- Response: Send money from accounts to Third Party by Hashed key</li> 
+      </ul>    
+  </li>
+    <li> Third Party routes:
+      <ul> 
+        <li> Method: GET -- Route: /third-party/receive-money/{hashed-key} -- Response: Get transactions with received money from accounts by Hashed key</li>
+        <li> Method: GET -- Route: /third-party/send-money/{hashed-key} -- Response: Get transactions with sent money from accounts by Hashed key</li>
+        <li> Method: POST -- Route: /third-party/send-money/{hashed-key} -- Response: Send money to accounts by Hashed key</li>
       </ul>    
   </li>
 </ol>
+## Database diagram:
+![img.png](img.png)
+
+Thank you

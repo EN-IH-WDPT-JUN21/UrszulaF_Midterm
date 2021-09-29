@@ -163,13 +163,31 @@ public class TransactionService implements ITransactionService {
     public Transaction transfer(TransactionDTO transactionDTO){
 
         ////check user
-        //checks sender account
+
+
+        //checks if there is sender account
         Optional<Account> senderAccount = accountRepository.findById(transactionDTO.getSenderAccountId());
         if(senderAccount.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no account with this id");
         }
-        //                check fraud
+        //check fraud
         checkFraud(senderAccount.get());
+        //interest rate applied for Credit card
+        boolean senderIsCreditCardAccount= isCreditCardAccount(senderAccount.get());
+        if(senderIsCreditCardAccount){
+        interestRate.applyInterestRate((CreditCardAccount) senderAccount.get());
+        }
+        //interest rate applied for Saving Account, also checks minimum balance and apply penalty fee
+        boolean senderIsSavingAccount= isSavingAccount(senderAccount.get());
+        if(senderIsSavingAccount){
+            interestRate.applyInterestRate((SavingAccount) senderAccount.get());
+            checkBalanceAndApplyExtraFees((Penalizable) senderAccount.get(), transactionDTO);
+        }
+        //checks minimum balance and apply penalty fee for Checking Account
+        boolean senderIsCheckingAccount= isCheckingAccount(senderAccount.get());
+        if(senderIsCheckingAccount){
+            checkBalanceAndApplyExtraFees((Penalizable) senderAccount.get(), transactionDTO);
+        }
         //checks if enough funds to make transfer
         boolean enough = enoughFunds(senderAccount.get(), transactionDTO.getAmount());
         if(!enough){
@@ -200,135 +218,6 @@ public class TransactionService implements ITransactionService {
 
         System.out.println(transactionDTO.getAmount() + " transferred from " + transactionDTO.getSenderAccountId() + " account to " + transactionDTO.getRecipientAccountId() + " account");
         return transaction;
-
-    }
-
-
-
-
-
-    //transfer method for Credit Card Accounts
-    public void transferCC(TransactionDTO transactionDTO){
-        Optional<CreditCardAccount> senderCreditCardAccount = creditCardAccountRepository.findById(transactionDTO.getSenderAccountId());
-        if(senderCreditCardAccount.isEmpty()){
-            System.out.println("There is no creditCardAccount with this id");
-        }else{
-            //                check fraud
-            checkFraud(senderCreditCardAccount.get());
-            //            interest rate applied
-            interestRate.applyInterestRate(senderCreditCardAccount.get());
-            //checks if enough funds to make transfer
-            boolean enough = enoughFunds(senderCreditCardAccount.get(), transactionDTO.getAmount());
-            if(enough){
-                Money senderBalanceBefore = senderCreditCardAccount.get().getBalance();
-                BigDecimal senderBalanceAfter = senderBalanceBefore.decreaseAmount(transactionDTO.getAmount());
-                Optional<Account> recipientAccount = accountRepository.findById(transactionDTO.getRecipientAccountId());
-                senderCreditCardAccount.get().setBalance(new Money(senderBalanceAfter));
-
-
-                if(recipientAccount.isEmpty()){
-                    System.out.println("This is external transfer. We can't check the creditCardAccount number");
-                    Transaction transaction = new Transaction(TransactionType.TRANSFER, transactionDTO.getAmount(), senderCreditCardAccount.get());
-                    transactionRepository.save(transaction);
-                    creditCardAccountRepository.save(senderCreditCardAccount.get());
-                }else{
-                    Money recipientBalanceBefore = recipientAccount.get().getBalance();
-                    BigDecimal recipientBalanceAfter = recipientBalanceBefore.increaseAmount(transactionDTO.getAmount());
-                    recipientAccount.get().setBalance(new Money(recipientBalanceAfter));
-                    Transaction transaction = new Transaction(TransactionType.TRANSFER, transactionDTO.getAmount(), senderCreditCardAccount.get(),recipientAccount.get());
-                    transactionRepository.save(transaction);
-                    creditCardAccountRepository.save(senderCreditCardAccount.get());
-                    accountRepository.save(recipientAccount.get());
-                }
-
-                System.out.println(transactionDTO.getAmount() + " transferred from " + transactionDTO.getSenderAccountId() + " creditCardAccount to " + transactionDTO.getRecipientAccountId() + " creditCardAccount");
-
-            }
-        }
-
-    }
-
-    //transfer method for Saving Accounts
-    public void transferSA(TransactionDTO transactionDTO){
-        Optional<SavingAccount> senderSavingAccount = savingAccountRepository.findById(transactionDTO.getSenderAccountId());
-        if(senderSavingAccount.isEmpty()){
-            System.out.println("There is no savingAccount with this id");
-        }else{
-            //                check fraud
-            checkFraud(senderSavingAccount.get());
-            //            interest rate applied
-            interestRate.applyInterestRate(senderSavingAccount.get());
-            //checks minimum balance and apply penalty fee
-            checkBalanceAndApplyExtraFees(senderSavingAccount.get(), transactionDTO);
-            //checks if enough funds to make transfer
-            boolean enough = enoughFunds(senderSavingAccount.get(), transactionDTO.getAmount());
-            if(enough){
-                Money senderBalanceBefore = senderSavingAccount.get().getBalance();
-                BigDecimal senderBalanceAfter = senderBalanceBefore.decreaseAmount(transactionDTO.getAmount());
-                Optional<Account> recipientAccount = accountRepository.findById(transactionDTO.getRecipientAccountId());
-                senderSavingAccount.get().setBalance(new Money(senderBalanceAfter));
-
-
-                if(recipientAccount.isEmpty()){
-                    System.out.println("This is external transfer. We can't check the savingAccount number");
-                    Transaction transaction = new Transaction(TransactionType.TRANSFER, transactionDTO.getAmount(), senderSavingAccount.get());
-                    transactionRepository.save(transaction);
-                    savingAccountRepository.save(senderSavingAccount.get());
-                }else{
-                    Money recipientBalanceBefore = recipientAccount.get().getBalance();
-                    BigDecimal recipientBalanceAfter = recipientBalanceBefore.increaseAmount(transactionDTO.getAmount());
-                    recipientAccount.get().setBalance(new Money(recipientBalanceAfter));
-                    Transaction transaction = new Transaction(TransactionType.TRANSFER, transactionDTO.getAmount(), senderSavingAccount.get(),recipientAccount.get());
-                    transactionRepository.save(transaction);
-                    savingAccountRepository.save(senderSavingAccount.get());
-                    accountRepository.save(recipientAccount.get());
-                }
-
-                System.out.println(transactionDTO.getAmount() + " transferred from " + transactionDTO.getSenderAccountId() + " savingAccount to " + transactionDTO.getRecipientAccountId() + " savingAccount");
-                
-            }
-        }
-
-    }
-
-    //transfer method for Checking Accounts
-    public void transferCA(TransactionDTO transactionDTO){
-        Optional<CheckingAccount> senderCheckingAccount = checkingAccountRepository.findById(transactionDTO.getSenderAccountId());
-        if(senderCheckingAccount.isEmpty()){
-            System.out.println("There is no checkingAccount with this id");
-        }else{
-            //                check fraud
-            checkFraud(senderCheckingAccount.get());
-            //checks minimum balance and apply penalty fee
-            checkBalanceAndApplyExtraFees(senderCheckingAccount.get(), transactionDTO);
-            //checks if enough funds to make transfer
-            boolean enough = enoughFunds(senderCheckingAccount.get(), transactionDTO.getAmount());
-            if(enough){
-                Money senderBalanceBefore = senderCheckingAccount.get().getBalance();
-                BigDecimal senderBalanceAfter = senderBalanceBefore.decreaseAmount(transactionDTO.getAmount());
-                Optional<Account> recipientAccount = accountRepository.findById(transactionDTO.getRecipientAccountId());
-                senderCheckingAccount.get().setBalance(new Money(senderBalanceAfter));
-
-
-                if(recipientAccount.isEmpty()){
-                    System.out.println("This is external transfer. We can't check the checkingAccount number");
-                    Transaction transaction = new Transaction(TransactionType.TRANSFER, transactionDTO.getAmount(), senderCheckingAccount.get());
-                    transactionRepository.save(transaction);
-                    checkingAccountRepository.save(senderCheckingAccount.get());
-                }else{
-                    Money recipientBalanceBefore = recipientAccount.get().getBalance();
-                    BigDecimal recipientBalanceAfter = recipientBalanceBefore.increaseAmount(transactionDTO.getAmount());
-                    recipientAccount.get().setBalance(new Money(recipientBalanceAfter));
-                    Transaction transaction = new Transaction(TransactionType.TRANSFER, transactionDTO.getAmount(), senderCheckingAccount.get(),recipientAccount.get());
-                    transactionRepository.save(transaction);
-                    checkingAccountRepository.save(senderCheckingAccount.get());
-                    accountRepository.save(recipientAccount.get());
-                }
-
-                System.out.println(transactionDTO.getAmount() + " transferred from " + transactionDTO.getSenderAccountId() + " checkingAccount to " + transactionDTO.getRecipientAccountId() + " checkingAccount");
-
-            }
-        }
 
     }
 
@@ -411,15 +300,15 @@ public class TransactionService implements ITransactionService {
         return dropsBelowMinimumBalance;
     }
 
-    private boolean senderIsCreditCardAccount(TransactionDTO transactionDTO) {
-        return creditCardAccountRepository.findById(transactionDTO.getSenderAccountId()).isPresent();
+    private boolean isCreditCardAccount(Account account) {
+        return creditCardAccountRepository.findById(account.getId()).isPresent();
     }
 
-    private boolean senderIsSavingAccount(TransactionDTO transactionDTO) {
-        return savingAccountRepository.findById(transactionDTO.getSenderAccountId()).isPresent();
+    private boolean isSavingAccount(Account account) {
+        return savingAccountRepository.findById(account.getId()).isPresent();
     }
 
-    private boolean senderIsCheckingAccount(TransactionDTO transactionDTO) {
-        return checkingAccountRepository.findById(transactionDTO.getSenderAccountId()).isPresent();
+    private boolean isCheckingAccount(Account account) {
+        return checkingAccountRepository.findById(account.getId()).isPresent();
     }
 }

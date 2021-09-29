@@ -1,5 +1,6 @@
 /*
 use midterm;
+show tables;
 select * from role;
 select * from user;
 select * from admin;
@@ -11,7 +12,8 @@ select * from credit_card_account;
 select * from saving_account;
 select * from account_secondary_owners;
 select * from transaction;
-select * from transaction;
+select * from third_party_transaction_send;
+select * from third_party_transaction_receive;
 select * from third_party;
 */
 
@@ -54,12 +56,19 @@ INSERT INTO account_secondary_owners (`account_id`,`secondary_owner_id`) VALUES
 (3,1);
 INSERT INTO transaction (`amount`, `currency`, `time_stamp`,`transaction_type`,`recipient_account_id`,`sender_account_id`) VALUES
 (100, 'USD','2020-04-02', 'TRANSFER', 2,1),
-(200, 'USD','2021-04-02', 'TRANSFER', 4,3);
+(200, 'USD','2021-09-28', 'TRANSFER', 4,3);
+
 INSERT INTO third_party (`hashed_key`,`name`) VALUES
 ('secret','Jola'),
 ('mine','Jerzy');
-INSERT INTO third_party_transaction (`amount`, `currency`, `time_stamp`,`transaction_type`,`recipient_account_id`,`third_party_id`) VALUES
+INSERT INTO third_party_transaction_send (`amount`, `currency`, `time_stamp`,`transaction_type`,`recipient_account_id`,`sender_third_party_id`) VALUES
 (300, 'USD','2000-04-02', 'TRANSFER', 2,1),
 (400, 'USD','2010-04-02', 'TRANSFER', 4,2);
 
+INSERT INTO third_party_transaction_receive (`amount`, `currency`, `time_stamp`,`transaction_type`,`recipient_third_party_id`,`sender_account_id`) VALUES
+(50, 'USD','2000-04-02', 'TRANSFER', 1, 2),
+(100, 'USD','2010-04-02', 'TRANSFER', 2,4);
 
+/*SELECT SUM(t.amount) FROM transaction t WHERE t.time_stamp < date_sub(now(), interval 24 HOUR) GROUP BY DATE(t.time_stamp) ORDER BY 1 DESC LIMIT 1;*/
+
+/*SELECT SUM(t.amount) FROM transaction t WHERE sender_account_id = 3 AND t.time_stamp > date_sub(now(), interval 24 HOUR) LIMIT 1;*/

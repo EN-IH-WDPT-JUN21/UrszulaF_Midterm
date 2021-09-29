@@ -1,8 +1,10 @@
 package com.ironhack.midterm.controller.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ironhack.midterm.controller.dto.TransactionDTO;
-import com.ironhack.midterm.controller.interfaces.ITransactionController;
+import com.ironhack.midterm.controller.dto.ThirdPartyTransactionReceiveDTO;
+import com.ironhack.midterm.controller.dto.ThirdPartyTransactionSendDTO;
+import com.ironhack.midterm.controller.interfaces.IThirdPartyTransactionReceiveController;
+import com.ironhack.midterm.controller.interfaces.IThirdPartyTransactionSendController;
 import com.ironhack.midterm.dao.account.*;
 import com.ironhack.midterm.dao.user.*;
 import com.ironhack.midterm.enums.TransactionType;
@@ -20,20 +22,18 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-class TransactionControllerTest {
+class ThirdPartyTransactionReceiveControllerTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -70,10 +70,10 @@ class TransactionControllerTest {
     private StudentCheckingAccountRepository studentCheckingAccountRepository;
 
     @Autowired
-    private TransactionRepository transactionRepository;
+    private ThirdPartyTransactionReceiveRepository thirdPartyTransactionReceiveRepository;
 
     @Autowired
-    private ITransactionController transactionController;
+    private IThirdPartyTransactionReceiveController thirdPartyTransactionController;
 
     private MockMvc mockMvc;
 
@@ -90,14 +90,15 @@ class TransactionControllerTest {
 
     private Admin admin1;
     private ThirdParty thirdParty1;
+    private ThirdParty thirdParty2;
 
     private CheckingAccount checkingAccount1;
     private CreditCardAccount creditCardAccount1;
     private SavingAccount savingAccount1;
     private StudentCheckingAccount studentCheckingAccount1;
 
-    private Transaction transaction1;
-    private Transaction transaction2;
+    private ThirdPartyTransactionReceive thirdPartyTransactionReceive1;
+    private ThirdPartyTransactionReceive thirdPartyTransactionReceive2;
 
     @BeforeEach
     void setUp() {
@@ -119,6 +120,11 @@ class TransactionControllerTest {
         List<Admin> admins = adminRepository.saveAll(List.of(admin1));
         User user1= userRepository.findByUsername(accountHolder1.getUsername()).get();
         User user2= userRepository.findByUsername(accountHolder2.getUsername()).get();
+
+        thirdParty1 = new ThirdParty("secret", "Jola");
+        thirdParty2 = new ThirdParty("mine", "Jerzy");
+        List<ThirdParty> thirdParties = thirdPartyRepository.saveAll(List.of(thirdParty1, thirdParty2));
+
         checkingAccount1 = new CheckingAccount(new Money(new BigDecimal(1000)), "12345", accountHolder1, List.of(accountHolder2));
         checkingAccount1.setCreationDate(LocalDateTime.of(2019,8,27,12,0));
         checkingAccountRepository.save(checkingAccount1);
@@ -130,11 +136,11 @@ class TransactionControllerTest {
         studentCheckingAccount1 = new StudentCheckingAccount(new Money(new BigDecimal(1000)), "23232", accountHolder5, List.of());
         studentCheckingAccountRepository.save(studentCheckingAccount1);
         List<Account> accounts = accountRepository.saveAll(List.of(checkingAccount1, creditCardAccount1, savingAccount1, studentCheckingAccount1));
-        transaction1 = new Transaction(TransactionType.TRANSFER, new Money(new BigDecimal(100)), checkingAccount1, creditCardAccount1);
-        transaction1.setTimeStamp(LocalDateTime.of(2021,9,20,12,0));
-        transaction2 = new Transaction(TransactionType.TRANSFER, new Money(new BigDecimal(200)), savingAccount1, studentCheckingAccount1);
-        transaction2.setTimeStamp(LocalDateTime.of(2021,8,27,12,0));
-        transactionRepository.saveAll(List.of(transaction1,transaction2));
+        thirdPartyTransactionReceive1 = new ThirdPartyTransactionReceive(TransactionType.TRANSFER, new Money(new BigDecimal(50)), creditCardAccount1, thirdParty1);
+        thirdPartyTransactionReceive1.setTimeStamp(LocalDateTime.of(2021,9,20,12,0));
+        thirdPartyTransactionReceive2 = new ThirdPartyTransactionReceive(TransactionType.TRANSFER, new Money(new BigDecimal(80)), studentCheckingAccount1, thirdParty2);
+        thirdPartyTransactionReceive2.setTimeStamp(LocalDateTime.of(2021,8,27,12,0));
+        thirdPartyTransactionReceiveRepository.saveAll(List.of(thirdPartyTransactionReceive1, thirdPartyTransactionReceive2));
 
     }
 
@@ -146,73 +152,44 @@ class TransactionControllerTest {
     }
 
     @Test
-    void getById() {
+    void getThirdPartyTransactionReceives() throws Exception{
+        MvcResult result = mockMvc.perform(get("/third-party-receive-transactions")).andDo(print()).andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("50"));
+        assertTrue(result.getResponse().getContentAsString().contains("80"));
     }
 
     @Test
-    void getTransactions() throws Exception{
-        MvcResult result = mockMvc.perform(get("/transactions")).andDo(print()).andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("100"));
-        assertTrue(result.getResponse().getContentAsString().contains("200"));
+    void getById() throws Exception {
+        MvcResult result = mockMvc.perform(
+                get("/third-party-receive-transactions/"+ thirdPartyTransactionReceive1.getId())
+        ).andDo(print()).andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("50"));
+        assertFalse(result.getResponse().getContentAsString().contains("80"));
+    }
+
+    @Test
+    void getByHashedKey() throws Exception{
+        MvcResult result = mockMvc.perform(
+                get("/third-party/receive-money/"+thirdParty1.getHashedKey())
+        ).andDo(print()).andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("50"));
+        assertFalse(result.getResponse().getContentAsString().contains("80"));
     }
 
     @Test
     void transfer() throws Exception{
-        BigDecimal senderAccountBalance0 = studentCheckingAccount1.getBalance().getAmount();
-        BigDecimal recipientAccountBalance0 = checkingAccount1.getBalance().getAmount();
-        TransactionDTO transaction1 = new TransactionDTO(TransactionType.TRANSFER, new Money(new BigDecimal(50)), studentCheckingAccount1.getId(), checkingAccount1.getId());
-        String body = objectMapper.writeValueAsString(transaction1);
+        BigDecimal senderAccountBalance0 = checkingAccount1.getBalance().getAmount();
+        ThirdPartyTransactionReceiveDTO thirdPartyTransaction1 = new ThirdPartyTransactionReceiveDTO(TransactionType.TRANSFER, new Money(new BigDecimal(50)), checkingAccount1.getId(), checkingAccount1.getSecretKey());
+        String body = objectMapper.writeValueAsString(thirdPartyTransaction1);
         MvcResult result = mockMvc.perform(
-                post("/transfer")
+                post("/third-party/receive-money/"+thirdParty1.getHashedKey())
                         .content(body)
                         .contentType(MediaType.APPLICATION_JSON)
         ).andDo(print()).andExpect(status().isCreated()).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("50"));
-        BigDecimal transfer = transaction1.getAmount().getAmount();
-        Account checkAccount= accountRepository.findById(transaction1.getSenderAccountId()).get();
-        BigDecimal senderAccountBalance1 = checkAccount.getBalance().getAmount();
-        Account checkAccount2= accountRepository.findById(transaction1.getRecipientAccountId()).get();
-        BigDecimal recipientAccountBalance1 = checkAccount2.getBalance().getAmount();
+        BigDecimal transfer = thirdPartyTransaction1.getAmount().getAmount();
+        Account checkAccount2= accountRepository.findById(thirdPartyTransaction1.getSenderAccountId()).get();
+        BigDecimal senderAccountBalance1 = checkAccount2.getBalance().getAmount();
         assertEquals(transfer, senderAccountBalance0.subtract(senderAccountBalance1));
-    }
-
-    @Test
-    void transfer_withInterestRate() throws Exception{
-        BigDecimal senderAccountBalance0 = creditCardAccount1.getBalance().getAmount();
-        System.out.println("before interests=" + senderAccountBalance0);
-        Long monthsBetween = ChronoUnit.MONTHS.between(creditCardAccount1.getLastInterestApplied(), LocalDateTime.now());
-        System.out.println("monthsBetween = " + monthsBetween);
-        System.out.println("rate= " + creditCardAccount1.getInterestRate().setScale(4, RoundingMode.HALF_EVEN));
-        System.out.println("rate/12= " + creditCardAccount1.getInterestRate()
-                .divide(new BigDecimal("12"), RoundingMode.HALF_EVEN).setScale(4, RoundingMode.HALF_EVEN));
-        System.out.println("capitalization= " +
-                BigDecimal.ONE.add(
-                        creditCardAccount1.getInterestRate().setScale(4, RoundingMode.HALF_EVEN)
-                                .divide(new BigDecimal("12"), RoundingMode.HALF_EVEN))
-                        .pow(Math.toIntExact(monthsBetween)).setScale(4, RoundingMode.HALF_EVEN));
-        BigDecimal senderAccountBalance0withInterests =                      creditCardAccount1.getBalance().getAmount()
-                .multiply(
-                        BigDecimal.ONE.add(
-                                creditCardAccount1.getInterestRate().setScale(4, RoundingMode.HALF_EVEN)
-                                        .divide(new BigDecimal("12"), RoundingMode.HALF_EVEN))
-                                .pow(Math.toIntExact(monthsBetween))
-                ).setScale(2, RoundingMode.HALF_EVEN);
-        System.out.println("after interests= " + senderAccountBalance0withInterests);
-        BigDecimal recipientAccountBalance0 = studentCheckingAccount1.getBalance().getAmount();
-        TransactionDTO transaction1 = new TransactionDTO(TransactionType.TRANSFER, new Money(new BigDecimal(50)), creditCardAccount1.getId(), studentCheckingAccount1.getId());
-        String body = objectMapper.writeValueAsString(transaction1);
-        MvcResult result = mockMvc.perform(
-                post("/transfer")
-                        .content(body)
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andDo(print()).andExpect(status().isCreated()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("50"));
-        BigDecimal transfer = transaction1.getAmount().getAmount();
-        Account checkAccount= accountRepository.findById(transaction1.getSenderAccountId()).get();
-        BigDecimal senderAccountBalance1 = checkAccount.getBalance().getAmount();
-
-        Account checkAccount2= accountRepository.findById(transaction1.getRecipientAccountId()).get();
-        BigDecimal recipientAccountBalance1 = checkAccount2.getBalance().getAmount();
-        assertEquals(transfer, senderAccountBalance0withInterests.subtract(senderAccountBalance1));
     }
 }

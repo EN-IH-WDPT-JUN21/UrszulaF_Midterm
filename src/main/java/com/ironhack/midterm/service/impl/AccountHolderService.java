@@ -1,8 +1,11 @@
 package com.ironhack.midterm.service.impl;
 
 import com.ironhack.midterm.controller.dto.AccountHolderDTO;
+import com.ironhack.midterm.dao.account.Account;
 import com.ironhack.midterm.dao.user.AccountHolder;
+import com.ironhack.midterm.dao.user.Role;
 import com.ironhack.midterm.repository.AccountHolderRepository;
+import com.ironhack.midterm.repository.RoleRepository;
 import com.ironhack.midterm.service.interfaces.IAccountHolderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,10 +23,18 @@ public class AccountHolderService implements IAccountHolderService {
     @Autowired
     AccountHolderRepository accountHolderRepository;
 
+    @Autowired
+    RoleRepository roleRepository;
+
     public AccountHolder store(AccountHolderDTO accountHolderDTO) {
+        //checks if there is role with this id
+        Optional<Role> role = roleRepository.findById(accountHolderDTO.getRoleId());
+        if(role.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no role with this id");
+        }
         List<AccountHolder> accountHolder = accountHolderRepository.findAll();
         AccountHolder newAccountHolder = null;
-        newAccountHolder = new AccountHolder(accountHolderDTO.getUsername(), accountHolderDTO.getPassword(), accountHolderDTO.getRole(), LocalDate.parse(accountHolderDTO.getDateOfBirth()), accountHolderDTO.getPrimaryAddress(), accountHolderDTO.getMailingAddress());
+        newAccountHolder = new AccountHolder(accountHolderDTO.getUsername(), accountHolderDTO.getPassword(), role.get(), LocalDate.parse(accountHolderDTO.getDateOfBirth()), accountHolderDTO.getPrimaryAddress(), accountHolderDTO.getMailingAddress());
         if (!accountHolder.contains(newAccountHolder)) {
             return accountHolderRepository.save(newAccountHolder);
         } else {

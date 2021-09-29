@@ -48,19 +48,21 @@ public class CreditCardAccount extends Account {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss")
-    @UpdateTimestamp
+//    @UpdateTimestamp
     private LocalDateTime lastInterestApplied;
 
     public CreditCardAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, Money creditLimit, BigDecimal interestRate) {
         super(balance, secretKey, primaryOwner, secondaryOwners);
         setCreditLimit(creditLimit);
         setInterestRate(interestRate);
+        this.lastInterestApplied = LocalDateTime.now();
     }
 
     public CreditCardAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, BigDecimal interestRate) {
         super(balance, secretKey, primaryOwner, secondaryOwners);
         this.creditLimit = new Money(Constants.CCARD_ACC_DEFAULT_CREDIT_LIMIT);
         setInterestRate(interestRate);
+        this.lastInterestApplied = LocalDateTime.now();
     }
 
     public CreditCardAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, Money creditLimit) {
@@ -75,6 +77,39 @@ public class CreditCardAccount extends Account {
         this.creditLimit = new Money(Constants.CCARD_ACC_DEFAULT_CREDIT_LIMIT);
         this.interestRate = Constants.CCARD_ACC_DEFAULT_INTEREST_RATE;
         this.lastInterestApplied = LocalDateTime.now();
+    }
+
+    //for creating accounts with past date - for testing purposes
+    public CreditCardAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, Money creditLimit, BigDecimal interestRate, LocalDateTime creationDate) {
+        super(balance, secretKey, primaryOwner, secondaryOwners);
+        setCreditLimit(creditLimit);
+        setInterestRate(interestRate);
+        this.lastInterestApplied=creationDate;
+//        this.lastInterestApplied = LocalDateTime.now();
+    }
+
+    public CreditCardAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, BigDecimal interestRate, LocalDateTime creationDate) {
+        super(balance, secretKey, primaryOwner, secondaryOwners, creationDate);
+        this.creditLimit = new Money(Constants.CCARD_ACC_DEFAULT_CREDIT_LIMIT);
+        setInterestRate(interestRate);
+        this.lastInterestApplied=creationDate;
+//        this.lastInterestApplied = LocalDateTime.now();
+    }
+
+    public CreditCardAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, Money creditLimit, LocalDateTime creationDate) {
+        super(balance, secretKey, primaryOwner, secondaryOwners, creationDate);
+        setCreditLimit(creditLimit);
+        this.interestRate = Constants.CCARD_ACC_DEFAULT_INTEREST_RATE;
+        this.lastInterestApplied=creationDate;
+//        this.lastInterestApplied = LocalDateTime.now();
+    }
+
+    public CreditCardAccount(Money balance, String secretKey, AccountHolder primaryOwner, List<AccountHolder> secondaryOwners, LocalDateTime creationDate) {
+        super(balance, secretKey, primaryOwner, secondaryOwners, creationDate);
+        this.creditLimit = new Money(Constants.CCARD_ACC_DEFAULT_CREDIT_LIMIT);
+        this.interestRate = Constants.CCARD_ACC_DEFAULT_INTEREST_RATE;
+        this.lastInterestApplied=creationDate;
+//        this.lastInterestApplied = LocalDateTime.now();
     }
 
 
@@ -97,10 +132,8 @@ public class CreditCardAccount extends Account {
             System.out.println("Interest rate can't be lower than " + Constants.CCARD_ACC_MIN_INTEREST_RATE);
             System.out.println("Interest rate set to min " + Constants.CCARD_ACC_MIN_INTEREST_RATE);
             this.interestRate = Constants.CCARD_ACC_MIN_INTEREST_RATE;
-            this.lastInterestApplied = LocalDateTime.now();
         }else{
             this.interestRate = interestRate;
-            this.lastInterestApplied = LocalDateTime.now();
         }
 
 
