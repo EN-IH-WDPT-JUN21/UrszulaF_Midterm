@@ -233,7 +233,12 @@ Depending on the route you are trying to access, you will need different privile
       </ul>    
   </li>
 </ol>
-## Database diagram:
-![img.png](img.png)
 
-Thank you
+## Database diagram:
+
+![diagram](https://user-images.githubusercontent.com/85784274/135336605-9cc50e1c-ee59-4f6e-b6a0-c578e2dd067d.png)
+
+
+Thank you,
+
+Urszula Figurska
