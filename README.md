@@ -24,17 +24,34 @@ This a list of minimum requirements to run the program:
 
 ### Installation
 
-Clone/download the repo from:
+Clone/download the repo from this site:
    ```sh
-   git clone ...
+   git clone https://github.com/EN-IH-WDPT-JUN21/UrszulaF_Midterm.git
    ```
 To run this project locally do the following after cloning or downloading the project:
 
 <ol>
   <li> Open the project on your IDE such as IntelliJ </li>
-  <li> Create the databases in MySQL: midterm (for running the project) and midterm_test (for testing)</li>
-  <li> Edit the application.properties file both in the main folder and test folder and insert your own credentials </li>
-  <li> Go to the MidtemApplication class in the `src` directory and run main method </li>
+  <li> Create the databases in MySQL: midterm (for running the project) and midterm_test (for testing). 
+    Just run "create database midterm;" and then "use midterm;". Same for midterm_test. </li>
+  <li> Edit the application.properties file both in the main folder and test folder and insert your own credentials.
+  Alternatively give credential to username tester and password tester123 in MySQL:
+   
+   ```sh
+CREATE USER 'tester'@'localhost' IDENTIFIED BY 'tester123';
+
+GRANT ALL PRIVILEGES ON *.* TO 'tester'@'localhost';
+
+FLUSH PRIVILEGES;
+   ```
+    
+
+I'm in Central European Timezone, so in my application.properties there is "?serverTimezone=UTC" in "spring.datasource.url=jdbc:mysql://localhost:3306/midterm?serverTimezone=UTC". If it doesn't work for you, please delete this part or change to your time-zone in both application.properties. 
+  </li>
+  <li> Go to the MidtemApplication class in the `src` directory (\src\main\java\com\ironhack\midterm) and run main method </li>
+  <li> Then you can upload some sample data from data.sql file in resources (\src\main\resources) to midterm database in MySQL. </li>
+  <li> In data.sql file there are some sample users and admins you can use. For simplicity all have the same password encrypted "123456". 
+    Just use their name for example "Boss" and password "123456" in browser or Postman </li>
 </ol>
 
 
@@ -180,7 +197,18 @@ To run this project locally do the following after cloning or downloading the pr
 
 ## API documentation:
  
-Depending on the route you are trying to access, you will need different privileges. These are the routes you can try and the permissions you will need to perform the action
+Depending on the route you are trying to access, you will need different privileges. 
+
+### Sample users:
+
+In data.sql file in resources (\src\main\resources) there are some sample users and admins you can use. Just upload the data to the midterm database in MySQL.
+For simplicity all have the same password encrypted "123456". 
+Just use their name for example "Boss" and password "123456" in browser or Postman.
+
+You can create your own users the same way.
+
+### Routes:
+These are the routes you can try and the permissions you will need to perform the action:
 
 <ol>
   <li> Admin routes:
